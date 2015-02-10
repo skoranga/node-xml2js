@@ -11,7 +11,8 @@
     "url" : "https://github.com/Leonidas-from-XIV/node-xml2js.git"
   },
   "dependencies" : {
-    "benchmark" : "^1.0",
+    "async-benchmark" : "^1.0",
+    "async": "~0.9",
     "xml2js": "git+https://github.com/Leonidas-from-XIV/node-xml2js.git#b7dc5528ce5e1c10991e1bc92f7ecec074ea0c36"
   },
   "licenses": [
