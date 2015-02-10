@@ -7,8 +7,9 @@
     var parseString_044 = require('xml2js').parseString;
     var parseString_perf = require('../lib/xml2js').parseString;
 
-    var simpleXML = "<root>Hello xml2js!</root>";
-    var complexXML = "<root><listtest>" +
+    var simpleXML = "<root>Hello xml2js!</root>",
+        badXML = "<root> bad xml </opps> </root>",
+        complexXML = "<root><listtest>" +
             "<item>" +
               "This is      " +
               "character    " +
@@ -42,6 +43,16 @@
         done();
       });
     },
+    benchParseString_044_Bad = function (done) {
+      parseString_044(badXML, function(err, result) {
+        done();
+      });
+    },
+    benchParseString_perf_Bad = function (done) {
+      parseString_perf(badXML, function(err, result) {
+        done();
+      });
+    },
     benchParseString_044_Complex = function (done) {
       parseString_044(complexXML, function(err, result) {
         done();
@@ -67,6 +78,18 @@
           });
         },
         function (cb) {
+          benchmark('xml2js_0.4.4 - Bad', benchParseString_044_Bad, function (err, event) {
+            console.log(event.target.toString());
+            cb();
+          });
+        },
+        function(cb) {
+          benchmark('xml2js_perf - Bad', benchParseString_perf_Bad, function (err, event) {
+            console.log(event.target.toString());
+            cb();
+          });
+        },
+        function (cb) {
           benchmark('xml2js_0.4.4 - complex', benchParseString_044_Complex, function (err, event) {
             console.log(event.target.toString());
             cb();
@@ -79,23 +102,4 @@
           });
         }
       ]);
-
-/*
-    suite.add('xml2js_0.4.4 - simple', function() {
-        parseString_044(simpleXML);
-    })
-    .add('xml2js_perf - simple', function() {
-        parseString_perf(simpleXML);
-    })
-    .add('xml2js_0.4.4 - complex', function() {
-        parseString_044(complexXML);
-    })
-    .add('xml2js_perf - complex', function() {
-        parseString_perf(complexXML);
-    })
-    .on('cycle', function(event) {
-        console.log(String(event.target));
-    })
-    .run({ 'async': true });
-    */
 })();
