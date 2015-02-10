@@ -1,0 +1,22 @@
+{
+  "name" : "xml2js-perf",
+  "description" : "perf tester for xml2js",
+  "version" : "0.0.1",
+  "main" : "./perf.js",
+  "scripts" : {
+    "test": "node perf.js"
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/Leonidas-from-XIV/node-xml2js.git"
+  },
+  "dependencies" : {
+    "benchmark" : "^1.0",
+    "xml2js": "git+https://github.com/Leonidas-from-XIV/node-xml2js.git#b7dc5528ce5e1c10991e1bc92f7ecec074ea0c36"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ]
+}

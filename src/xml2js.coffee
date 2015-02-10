@@ -15,6 +15,27 @@ processName = (processors, processedName) ->
 requiresCDATA = (entry) ->
   return entry.indexOf('&') >= 0 || entry.indexOf('>') >= 0 || entry.indexOf('<') >= 0
 
+tryValidate = (that, xpath, s, nodeName, obj) ->
+  try
+    obj = that.options.validator(xpath, s and s[nodeName], obj)
+  catch err
+    that.emit "error", err
+
+trySaxParse = (that, str) ->
+  try
+    str = bom.stripBOM str
+    if that.options.async
+      that.remaining = str
+      setImmediate that.processAsync
+      that.saxParser
+    that.saxParser.write(str).close()
+  catch err
+    unless that.saxParser.errThrown or that.saxParser.ended
+      that.emit 'error', err
+      that.saxParser.errThrown = true
+    else if that.saxParser.ended
+      throw err
+
 # Note that we do this manually instead of using xmlbuilder's `.dat` method
 # since it does not support escaping the CDATA close entity (throws an error if
 # it exists, and if it's pre-escaped).
@@ -291,10 +312,7 @@ class exports.Parser extends events.EventEmitter
 
       if @options.validator?
         xpath = "/" + (node["#name"] for node in stack).concat(nodeName).join("/")
-        try
-          obj = @options.validator(xpath, s and s[nodeName], obj)
-        catch err
-          @emit "error", err
+        tryValidate(@, xpath, s, nodeName, obj);
 
       # put children into <childkey> property and unfold chars if necessary
       if @options.explicitChildren and not @options.mergeAttrs and typeof obj is 'object'
@@ -356,19 +374,7 @@ class exports.Parser extends events.EventEmitter
       @emit "end", null
       return true
 
-    try
-      str = bom.stripBOM str
-      if @options.async
-        @remaining = str
-        setImmediate @processAsync
-        @saxParser
-      @saxParser.write(str).close()
-    catch err
-      unless @saxParser.errThrown or @saxParser.ended
-        @emit 'error', err
-        @saxParser.errThrown = true
-      else if @saxParser.ended
-        throw err
+    trySaxParse(@, str)
 
 exports.parseString = (str, a, b) ->
   # let's determine what we got as arguments
